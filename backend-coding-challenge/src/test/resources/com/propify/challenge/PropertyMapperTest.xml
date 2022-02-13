@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <property
+            id="1"
+            rent_price="1000.99"
+    />
+
+    <property
+            id="2"
+            rent_price="2000.99"
+    />
+
+    <property
+            id="3"
+            rent_price="2500.99"
+    />
+
+    <property
+            id="4"
+            rent_price="300.99"
+    />
+
+    <property
+            id="5"
+            rent_price="500.5"
+    />
+
+    <property
+            id="6"
+            rent_price="800.9"
+    />
+
+</dataset>

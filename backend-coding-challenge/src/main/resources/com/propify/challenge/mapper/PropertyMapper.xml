@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.propify.challenge.mapper.PropertyMapper">
+    <!-- I would remove all this XML and replace this with Java code -->
+
+    <!-- This method is not properly implemented because I run out of time (the challenge is supposed to be
+     2hs long) -->
+    <insert id="insert" parameterType="com.propify.challenge.dto.Property">
+        INSERT INTO property (rent_price)
+        VALUES (#{rentPrice});
+    </insert>
+
+    <!-- This method is not properly implemented because I run out of time (the challenge is supposed to be
+     2hs long) -->
+    <update id="update">
+        UPDATE property
+        SET rent_price = ${rentPrice}
+        WHERE id = ${id}
+    </update>
+
+    <delete id="delete">
+        DELETE
+        FROM property
+        WHERE id = #{id};
+    </delete>
+
+    <!-- Applied some opinionated default values when NULL is received
+    as minRentPrice and/or maxRentPrice -->
+    <select id="search" resultType="com.propify.challenge.dto.Property">
+        SELECT id, rent_price AS rentPrice
+        FROM property
+        WHERE rent_price BETWEEN
+                  (CASE
+                       WHEN #{minRentPrice} IS NOT NULL
+                           THEN #{minRentPrice}
+                       ELSE 0
+                      END)
+                  AND
+                  (CASE
+                       WHEN #{maxRentPrice} IS NOT NULL
+                           THEN #{maxRentPrice}
+                       ELSE ~0
+                      END);
+
+    </select>
+
+    <select id="findById" resultType="com.propify.challenge.dto.Property">
+        SELECT id, rent_price AS rentPrice
+        FROM property
+        WHERE id = #{id};
+    </select>
+</mapper>

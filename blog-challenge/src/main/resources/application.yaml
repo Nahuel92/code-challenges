@@ -1,0 +1,7 @@
+spring:
+  jackson.serialization:
+    indent_output: true
+logging:
+  level:
+    root: DEBUG
+    org.springframework: INFO
