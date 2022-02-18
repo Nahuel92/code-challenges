@@ -27,7 +27,7 @@ public class ShellComp {
     }
 
     @ShellMethod("Initializes the SQLite database")
-    void createDb() {
+    void createDb() throws IOException {
         loanEventRepository.createDB();
     }
 
@@ -72,7 +72,7 @@ public class ShellComp {
         System.out.format("%10s%11s%17s%20s%n", "Identifier", "Date", "Initial Amt", "Current Balance");
 
         final var savedLoanEvents = loanEventRepository.fetch(endDate);
-        final var a = balance.calculateBalance(savedLoanEvents);
+        final var a = balance.calculateBalance(savedLoanEvents, endDate);
 
         final var decimalFormat = new DecimalFormat("0.00");
         System.out.println("\nSummary Statistics:");
@@ -118,6 +118,12 @@ class Advance {
     final LocalDate date;
     final BigDecimal originalAmount;
     BigDecimal balance;
+
+    public Advance(final LocalDate date, final BigDecimal originalAmount) {
+        this.date = date;
+        this.originalAmount = originalAmount;
+        this.balance = originalAmount;
+    }
 
     public Advance(final LocalDate date, final BigDecimal originalAmount, final BigDecimal balance) {
         this.date = date;
