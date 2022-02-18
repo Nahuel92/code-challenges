@@ -13,7 +13,9 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ShellComponent
@@ -74,13 +76,15 @@ public class ShellComp {
         final var savedLoanEvents = loanEventRepository.fetch(endDate);
         final var a = balance.calculateBalance(savedLoanEvents, endDate);
 
+        printBalances(a.advances());
+
         final var decimalFormat = new DecimalFormat("0.00");
         System.out.println("\nSummary Statistics:");
         System.out.println("----------------------------------------------------------");
-        System.out.format("Aggregate Advance Balance:%31s%n", a.get("aggregateAdvanceBalance").compareTo(BigDecimal.ZERO) >= 0 ? decimalFormat.format(a.get("aggregateAdvanceBalance").abs()) : decimalFormat.format(0.0) );
-        System.out.format("Interest Payable Balance:%32s%n", decimalFormat.format(a.get("interestPayableBalance")) );
-        System.out.format("Total Interest Paid:%37s%n", decimalFormat.format(a.get("totalInterestPaid")));
-        System.out.format("Balance Applicable to Future Advances:%19s%n", a.get("aggregateAdvanceBalance").compareTo(BigDecimal.ZERO) < 0 ? decimalFormat.format(a.get("aggregateAdvanceBalance").abs()) : decimalFormat.format(0.0) );
+        System.out.format("Aggregate Advance Balance:%31s%n", a.aggregateAdvanceBalance().compareTo(BigDecimal.ZERO) >= 0 ? decimalFormat.format(a.aggregateAdvanceBalance().abs()) : decimalFormat.format(0.0));
+        System.out.format("Interest Payable Balance:%32s%n", decimalFormat.format(a.interestPayableBalance()));
+        System.out.format("Total Interest Paid:%37s%n", decimalFormat.format(a.totalInterestPaid()));
+        System.out.format("Balance Applicable to Future Advances:%19s%n", a.aggregateAdvanceBalance().compareTo(BigDecimal.ZERO) < 0 ? decimalFormat.format(a.aggregateAdvanceBalance().abs()) : decimalFormat.format(0.0));
     }
 
     private boolean isValidDate(final String endDate) {
@@ -89,6 +93,19 @@ public class ShellComp {
             return true;
         } catch (final IllegalArgumentException | DateTimeParseException e) {
             return false;
+        }
+    }
+
+    private void printBalances(final Collection<Advance> advances) {
+        final var decimalFormat = new DecimalFormat("0.00");
+        var i = 1;
+        for (var e : advances) {
+            System.out.format("%10s%11s%17s%20s%n",
+                    i++,
+                    e.getDate(),
+                    decimalFormat.format(e.getOriginalAmount()),
+                    decimalFormat.format(e.getBalance())
+            );
         }
     }
 }
@@ -145,5 +162,27 @@ class Advance {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Advance advance = (Advance) o;
+        return Objects.equals(date, advance.date) && Objects.equals(originalAmount, advance.originalAmount) && Objects.equals(balance, advance.balance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date, originalAmount, balance);
+    }
+
+    @Override
+    public String toString() {
+        return "Advance{" +
+                "date=" + date +
+                ", originalAmount=" + originalAmount +
+                ", balance=" + balance +
+                '}';
     }
 }

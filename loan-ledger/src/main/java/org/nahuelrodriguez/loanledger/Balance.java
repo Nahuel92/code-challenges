@@ -5,23 +5,15 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class Balance {
-    // suma el balance de los advances, saldo a favor o lo que falta pagar, puede ser negativo
     BigDecimal aggregateAdvanceBalance = BigDecimal.ZERO;
-
-    // lo que falta pagar de fees, interes diario >= 0
     BigDecimal interestPayableBalance = BigDecimal.ZERO;
-
-    // lo que pago en total de fees >= 0
     BigDecimal totalInterestPaid = BigDecimal.ZERO;
 
-    public Map<String, BigDecimal> calculateBalance(final List<SavedLoanEvent> savedLoanEvents, final String date) {
+    public Balanc calculateBalance(final List<SavedLoanEvent> savedLoanEvents, final String date) {
         LocalDate lastEventDate = null;
         final var advances = new LinkedHashSet<Advance>();
         for (var loanEvent : savedLoanEvents) {
@@ -49,13 +41,7 @@ public class Balance {
         }
 
         updateFees(lastEventDate, LocalDate.parse(date).plusDays(1));
-        printBalances(advances);
-
-        final var output = Map.ofEntries(
-                Map.entry("aggregateAdvanceBalance", aggregateAdvanceBalance),
-                Map.entry("interestPayableBalance", interestPayableBalance),
-                Map.entry("totalInterestPaid", totalInterestPaid)
-        );
+        final var output = new Balanc(aggregateAdvanceBalance, interestPayableBalance, totalInterestPaid, advances);
         aggregateAdvanceBalance = interestPayableBalance = totalInterestPaid = BigDecimal.ZERO;
         return output;
     }
@@ -81,7 +67,6 @@ public class Balance {
     }
 
     private void processPayment(BigDecimal payAmount, final Set<Advance> advances) {
-        // 1. bajar el daily fee
         if (payAmount.subtract(interestPayableBalance).compareTo(BigDecimal.ZERO) >= 0) {
             aggregateAdvanceBalance = aggregateAdvanceBalance.add(interestPayableBalance);
             totalInterestPaid = totalInterestPaid.add(interestPayableBalance);
@@ -93,7 +78,6 @@ public class Balance {
             payAmount = BigDecimal.ZERO;
         }
 
-        // 2. bajar el oldest advance
         if (payAmount.compareTo(BigDecimal.ZERO) > 0) {
             for (var entry : advances) {
                 if (entry.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
@@ -111,23 +95,8 @@ public class Balance {
                 payAmount = BigDecimal.ZERO;
             }
         }
-
-        // 3. acumular saldo a favor
-        if (payAmount.compareTo(BigDecimal.ZERO) > 0) {
-            //aggregateAdvanceBalance = aggregateAdvanceBalance.subtract(payAmount);
-        }
-    }
-
-    private void printBalances(final LinkedHashSet<Advance> advances) {
-        final var decimalFormat = new DecimalFormat("00.00");
-        var i = 1;
-        for (var e : advances) {
-            System.out.format("%10s%11s%17s%20s%n",
-                    i++,
-                    e.getDate(),
-                    decimalFormat.format(e.getOriginalAmount()),
-                    decimalFormat.format(e.getBalance())
-            );
-        }
     }
 }
+
+record Balanc(BigDecimal aggregateAdvanceBalance, BigDecimal interestPayableBalance,
+              BigDecimal totalInterestPaid, Set<Advance> advances) {}
