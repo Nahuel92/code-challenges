@@ -10,21 +10,20 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @ShellComponent
 public class ShellComp {
     private final LoanEventRepository loanEventRepository;
+    private final Balance balance;
 
-    ShellComp(final LoanEventRepository loanEventRepository) {
+    ShellComp(final LoanEventRepository loanEventRepository, final Balance balance) {
         this.loanEventRepository = loanEventRepository;
+        this.balance = balance;
     }
 
     @ShellMethod("Initializes the SQLite database")
@@ -68,34 +67,20 @@ public class ShellComp {
         }
 
         System.out.println("Display balance statistics as of " + endDate + ".");
-
-        final var overallAdvanceBalance = 0.0;
-        final var overallInterestPayableBalance = 0.0;
-        final var overallInterestPaid = 0.0;
-        final var overallPaymentsForFuture = 0.0;
-
         System.out.println("Advances:");
         System.out.println("----------------------------------------------------------");
-        System.out.println("Identifier" + " ".repeat(11) + "Date" + " ".repeat(17) + "Initial Amt" + " ".repeat(20) + "Current Balance");
-        // TODO: FIXME Print each advance row and relevant advance statistics
-        // print summary statistics
+        System.out.format("%10s%11s%17s%20s%n", "Identifier", "Date", "Initial Amt", "Current Balance");
 
-        final var formatter = new DecimalFormat("##.00");
+        final var savedLoanEvents = loanEventRepository.fetch(endDate);
+        final var a = balance.calculateBalance(savedLoanEvents);
 
-        loanEventRepository.fetch()
-                        .forEach(e -> System.out.println(" ".repeat(10) + e.id() + " ".repeat(11) + e.date() +
-                                " ".repeat(17) + formatter.format(e.amount())
-
-                        ));
-
-        final var formatter2 = new DecimalFormat("0.00");
-
+        final var decimalFormat = new DecimalFormat("0.00");
         System.out.println("\nSummary Statistics:");
         System.out.println("----------------------------------------------------------");
-        System.out.println("Aggregate Advance Balance:" + " ".repeat(31) + formatter2.format(overallAdvanceBalance));
-        System.out.println("Interest Payable Balance:" + " ".repeat(32) + formatter2.format(overallInterestPayableBalance));
-        System.out.println("Total Interest Paid:" + " ".repeat(37) + formatter2.format(overallInterestPaid));
-        System.out.println("Balance Applicable to Future Advances:" + " ".repeat(19) + formatter2.format(overallPaymentsForFuture));
+        System.out.format("Aggregate Advance Balance:%31s%n", a.get("aggregateAdvanceBalance").compareTo(BigDecimal.ZERO) >= 0 ? decimalFormat.format(a.get("aggregateAdvanceBalance").abs()) : decimalFormat.format(0.0) );
+        System.out.format("Interest Payable Balance:%32s%n", decimalFormat.format(a.get("interestPayableBalance")) );
+        System.out.format("Total Interest Paid:%37s%n", decimalFormat.format(a.get("totalInterestPaid")));
+        System.out.format("Balance Applicable to Future Advances:%19s%n", a.get("aggregateAdvanceBalance").compareTo(BigDecimal.ZERO) < 0 ? decimalFormat.format(a.get("aggregateAdvanceBalance").abs()) : decimalFormat.format(0.0) );
     }
 
     private boolean isValidDate(final String endDate) {
@@ -116,8 +101,8 @@ class LoanEventParser {
         }
 
         final String type = columns[0];
-        final LocalDate date = LocalDate.parse(columns[1]);
-        final BigDecimal amount = new BigDecimal(columns[2]);
+        final var date = LocalDate.parse(columns[1]);
+        final var amount = new BigDecimal(columns[2]);
 
         return new LoanEvent(type, date, amount);
     }
@@ -127,4 +112,32 @@ record LoanEvent(String type, LocalDate date, BigDecimal amount) {
 }
 
 record SavedLoanEvent(Long id, String type, LocalDate date, BigDecimal amount) {
+}
+
+class Advance {
+    final LocalDate date;
+    final BigDecimal originalAmount;
+    BigDecimal balance;
+
+    public Advance(final LocalDate date, final BigDecimal originalAmount, final BigDecimal balance) {
+        this.date = date;
+        this.originalAmount = originalAmount;
+        this.balance = balance;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public BigDecimal getOriginalAmount() {
+        return originalAmount;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
 }

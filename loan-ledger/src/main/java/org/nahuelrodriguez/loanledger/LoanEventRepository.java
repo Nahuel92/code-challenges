@@ -77,15 +77,15 @@ public class LoanEventRepository {
                 .count();
     }
 
-    public Collection<SavedLoanEvent> fetch() {
+    public List<SavedLoanEvent> fetch() {
         return fetch(LocalDate.now().toString());
     }
 
-    public Collection<SavedLoanEvent> fetch(final String date) {
+    public List<SavedLoanEvent> fetch(final String date) {
         final var sql = """
                 SELECT id, type, date_created, amount
                 FROM events
-                WHERE date_created <= ? AND type = 'advance'
+                WHERE date_created <= ?
                 ORDER BY date_created;
                 """;
         return jdbcTemplate
