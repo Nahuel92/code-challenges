@@ -2,6 +2,7 @@ package org.nahuelrodriguez.loanledger.service
 
 import org.nahuelrodriguez.loanledger.entity.Advance
 import org.nahuelrodriguez.loanledger.entity.Balance
+import org.nahuelrodriguez.loanledger.entity.SummaryStatistics
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -19,7 +20,11 @@ class BalancePrinterServiceTest extends Specification {
         given: "a set of advances"
         def advances = Set.of(new Advance(1L, LocalDate.now(), new BigDecimal(150.50), new BigDecimal(165.25)))
         and: "a balance"
-        def balance = new Balance(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.TEN, advances)
+        def summaryStatistics = new SummaryStatistics(aggregateAdvanceBalance: BigDecimal.ZERO,
+                interestPayableBalance: BigDecimal.ZERO,
+                totalInterestPaid: BigDecimal.TEN
+        )
+        def balance = new Balance(summaryStatistics, advances)
 
         when: "printing the balance"
         def output = tapSystemOut(() -> subject.print(balance))
@@ -45,8 +50,8 @@ class BalancePrinterServiceTest extends Specification {
                 "\nSummary Statistics:\n" +
                 "----------------------------------------------------------\n" +
                 String.format("Aggregate Advance Balance:%31s%n", balance.aggregateAdvanceBalance().round(2)) +
-                String.format("Interest Payable Balance:%32s%n", balance.interestPayableBalance().round(2)) +
-                String.format("Total Interest Paid:%37s%n", balance.totalInterestPaid().round(2)) +
+                String.format("Interest Payable Balance:%32s%n", balance.summaryStatistics().getInterestPayableBalance().round(2)) +
+                String.format("Total Interest Paid:%37s%n", balance.summaryStatistics().getTotalInterestPaid().round(2)) +
                 String.format("Balance Applicable to Future Advances:%19s%n", balance.balanceApplicableToFutureAdvances().round(2))
     }
 }

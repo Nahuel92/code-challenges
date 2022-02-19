@@ -32,8 +32,8 @@ class BalanceCalculatorServiceTest extends Specification {
 
         then: "the summary statistics are correct"
         results.aggregateAdvanceBalance().round(2) == 0.00
-        results.interestPayableBalance().round(2) == 0.00
-        results.totalInterestPaid().round(2) == 0.88
+        results.summaryStatistics().getInterestPayableBalance().round(2) == 0.00
+        results.summaryStatistics().getTotalInterestPaid().round(2) == 0.88
         results.balanceApplicableToFutureAdvances().round(2) == 99.12
         and: "the advances reflect a valid balance"
         assertThat(results.advances())

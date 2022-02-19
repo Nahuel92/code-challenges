@@ -37,8 +37,8 @@ public class BalancePrinterService {
         System.out.println("\nSummary Statistics:");
         System.out.println("----------------------------------------------------------");
         System.out.format("Aggregate Advance Balance:%31s%n", DECIMAL_FORMAT.format(balance.aggregateAdvanceBalance()));
-        System.out.format("Interest Payable Balance:%32s%n", DECIMAL_FORMAT.format(balance.interestPayableBalance()));
-        System.out.format("Total Interest Paid:%37s%n", DECIMAL_FORMAT.format(balance.totalInterestPaid()));
+        System.out.format("Interest Payable Balance:%32s%n", DECIMAL_FORMAT.format(balance.summaryStatistics().getInterestPayableBalance()));
+        System.out.format("Total Interest Paid:%37s%n", DECIMAL_FORMAT.format(balance.summaryStatistics().getTotalInterestPaid()));
         System.out.format("Balance Applicable to Future Advances:%19s%n", DECIMAL_FORMAT.format(balance.balanceApplicableToFutureAdvances()));
     }
 }
