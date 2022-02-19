@@ -1,5 +1,10 @@
-package org.nahuelrodriguez.loanledger;
+package org.nahuelrodriguez.loanledger.shell;
 
+import org.nahuelrodriguez.loanledger.service.BalanceCalculatorService;
+import org.nahuelrodriguez.loanledger.entity.LoanEvent;
+import org.nahuelrodriguez.loanledger.parser.LoanEventParser;
+import org.nahuelrodriguez.loanledger.repository.LoanEventRepository;
+import org.nahuelrodriguez.loanledger.service.BalancePrinterService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -15,17 +20,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ShellComponent
-public class ShellComp {
+public class ShellCLI {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final LoanEventRepository loanEventRepository;
-    private final BalanceCalculator balanceCalculator;
-    private final BalancePrinter balancePrinter;
+    private final BalanceCalculatorService balanceCalculatorService;
+    private final BalancePrinterService balancePrinterService;
 
-    ShellComp(final LoanEventRepository loanEventRepository, final BalanceCalculator balanceCalculator,
-              final BalancePrinter balancePrinter) {
+    ShellCLI(final LoanEventRepository loanEventRepository, final BalanceCalculatorService balanceCalculatorService,
+             final BalancePrinterService balancePrinterService) {
         this.loanEventRepository = loanEventRepository;
-        this.balanceCalculator = balanceCalculator;
-        this.balancePrinter = balancePrinter;
+        this.balanceCalculatorService = balanceCalculatorService;
+        this.balancePrinterService = balancePrinterService;
     }
 
     @ShellMethod("Initializes the SQLite database")
@@ -69,8 +74,8 @@ public class ShellComp {
         }
 
         final var savedLoanEvents = loanEventRepository.fetch(endDate);
-        final var balance = balanceCalculator.calculate(savedLoanEvents, endDate);
-        balancePrinter.print(balance);
+        final var balance = balanceCalculatorService.calculate(savedLoanEvents, endDate);
+        balancePrinterService.print(balance);
     }
 
     private boolean isValidDate(final String endDate) {

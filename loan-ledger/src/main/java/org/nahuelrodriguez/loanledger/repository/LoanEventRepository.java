@@ -1,5 +1,7 @@
-package org.nahuelrodriguez.loanledger;
+package org.nahuelrodriguez.loanledger.repository;
 
+import org.nahuelrodriguez.loanledger.entity.LoanEvent;
+import org.nahuelrodriguez.loanledger.entity.SavedLoanEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -75,10 +76,6 @@ public class LoanEventRepository {
                                 }
                         ))
                 .count();
-    }
-
-    public List<SavedLoanEvent> fetch() {
-        return fetch(LocalDate.now().toString());
     }
 
     public List<SavedLoanEvent> fetch(final String date) {

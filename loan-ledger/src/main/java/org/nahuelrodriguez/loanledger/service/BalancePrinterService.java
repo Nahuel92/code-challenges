@@ -1,12 +1,14 @@
-package org.nahuelrodriguez.loanledger;
+package org.nahuelrodriguez.loanledger.service;
 
-import org.springframework.stereotype.Component;
+import org.nahuelrodriguez.loanledger.entity.Advance;
+import org.nahuelrodriguez.loanledger.entity.Balance;
+import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.Collection;
 
-@Component
-public class BalancePrinter {
+@Service
+public class BalancePrinterService {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
     public void print(final Balance balance) {
@@ -22,15 +24,13 @@ public class BalancePrinter {
     }
 
     private void printBalances(final Collection<Advance> advances) {
-        var i = 1;
-        for (final var e : advances) {
-            System.out.format("%10s%11s%17s%20s%n",
-                    i++,
-                    e.getDate(),
-                    DECIMAL_FORMAT.format(e.getOriginalAmount()),
-                    DECIMAL_FORMAT.format(e.getBalance())
-            );
-        }
+        advances.forEach(e -> System.out.format("%10s%11s%17s%20s%n",
+                        e.id(),
+                        e.date(),
+                        DECIMAL_FORMAT.format(e.originalAmount()),
+                        DECIMAL_FORMAT.format(e.balance())
+                )
+        );
     }
 
     private void printSummaryStatistics(final Balance balance) {
