@@ -25,12 +25,14 @@ public class ShellCLI {
     private final LoanEventRepository loanEventRepository;
     private final BalanceCalculatorService balanceCalculatorService;
     private final BalancePrinterService balancePrinterService;
+    private final LoanEventParser loanEventParser;
 
     ShellCLI(final LoanEventRepository loanEventRepository, final BalanceCalculatorService balanceCalculatorService,
-             final BalancePrinterService balancePrinterService) {
+             final BalancePrinterService balancePrinterService, final LoanEventParser loanEventParser) {
         this.loanEventRepository = loanEventRepository;
         this.balanceCalculatorService = balanceCalculatorService;
         this.balancePrinterService = balancePrinterService;
+        this.loanEventParser = loanEventParser;
     }
 
     @ShellMethod("Initializes the SQLite database")
@@ -54,7 +56,7 @@ public class ShellCLI {
 
         final List<LoanEvent> set;
         try (final var content = Files.lines(path)) {
-            set = content.map(LoanEventParser::parse).collect(Collectors.toList());
+            set = content.map(loanEventParser::parse).collect(Collectors.toList());
         } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -22,13 +22,13 @@ public class BalanceCalculatorService {
         LocalDate lastEventDate = null;
         final var advances = new LinkedHashMap<Long, Advance>();
 
-        final var a = new AtomicLong(1);
+        final var id = new AtomicLong(1);
         for (final var loanEvent : savedLoanEvents) {
             updateFees(lastEventDate, loanEvent.date());
             lastEventDate = loanEvent.date();
 
             if (loanEvent.type().equals("advance")) {
-                advances.put(a.get(), advanceFrom(a.getAndIncrement(), loanEvent));
+                advances.put(id.get(), advanceFrom(id.getAndIncrement(), loanEvent));
                 aggregateAdvanceBalance = aggregateAdvanceBalance.add(loanEvent.amount());
                 continue;
             }
