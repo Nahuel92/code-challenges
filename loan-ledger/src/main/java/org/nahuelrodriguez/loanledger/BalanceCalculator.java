@@ -3,17 +3,17 @@ package org.nahuelrodriguez.loanledger;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Service
-public class Balance {
+public class BalanceCalculator {
     BigDecimal aggregateAdvanceBalance = BigDecimal.ZERO;
     BigDecimal interestPayableBalance = BigDecimal.ZERO;
     BigDecimal totalInterestPaid = BigDecimal.ZERO;
 
-    public Balanc calculateBalance(final List<SavedLoanEvent> savedLoanEvents, final String date) {
+    public Balance calculate(final List<SavedLoanEvent> savedLoanEvents, final String date) {
         LocalDate lastEventDate = null;
         final var advances = new LinkedHashSet<Advance>();
         for (var loanEvent : savedLoanEvents) {
@@ -25,8 +25,7 @@ public class Balance {
                 if (aggregateAdvanceBalance.compareTo(BigDecimal.ZERO) < 0) {
                     if (aggregateAdvanceBalance.add(loanEvent.amount()).compareTo(BigDecimal.ZERO) <= 0) {
                         advance = new Advance(loanEvent.date(), loanEvent.amount(), BigDecimal.ZERO);
-                    }
-                    else {
+                    } else {
                         advance = new Advance(loanEvent.date(), loanEvent.amount(), aggregateAdvanceBalance.add(loanEvent.amount()));
                     }
                 } else {
@@ -41,7 +40,7 @@ public class Balance {
         }
 
         updateFees(lastEventDate, LocalDate.parse(date).plusDays(1));
-        final var output = new Balanc(aggregateAdvanceBalance, interestPayableBalance, totalInterestPaid, advances);
+        final var output = new Balance(aggregateAdvanceBalance, interestPayableBalance, totalInterestPaid, advances);
         aggregateAdvanceBalance = interestPayableBalance = totalInterestPaid = BigDecimal.ZERO;
         return output;
     }
@@ -98,5 +97,19 @@ public class Balance {
     }
 }
 
-record Balanc(BigDecimal aggregateAdvanceBalance, BigDecimal interestPayableBalance,
-              BigDecimal totalInterestPaid, Set<Advance> advances) {}
+record Balance(BigDecimal aggregateAdvanceBalance, BigDecimal interestPayableBalance,
+               BigDecimal totalInterestPaid, Set<Advance> advances) {
+
+    public BigDecimal aggregateAdvanceBalance() {
+        return getAbsoluteValueOrZero(e -> e.compareTo(BigDecimal.ZERO) >= 0);
+    }
+
+    public BigDecimal balanceApplicableToFutureAdvances() {
+        return getAbsoluteValueOrZero(e -> e.compareTo(BigDecimal.ZERO) < 0);
+    }
+
+    private BigDecimal getAbsoluteValueOrZero(final Predicate<BigDecimal> condition) {
+        return condition.test(aggregateAdvanceBalance) ?
+                aggregateAdvanceBalance.abs() : BigDecimal.ZERO;
+    }
+}

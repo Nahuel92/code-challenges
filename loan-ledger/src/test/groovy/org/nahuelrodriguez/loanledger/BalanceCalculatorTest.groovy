@@ -1,6 +1,5 @@
 package org.nahuelrodriguez.loanledger
 
-
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Title
@@ -9,13 +8,13 @@ import java.time.LocalDate
 
 import static org.assertj.core.api.Assertions.assertThat
 
-@Subject(Balance)
+@Subject(BalanceCalculator)
 @Title("Unit tests for the Balance class")
-class BalanceTest extends Specification {
-    private Balance subject
+class BalanceCalculatorTest extends Specification {
+    private BalanceCalculator subject
 
     def setup() {
-        subject = new Balance()
+        subject = new BalanceCalculator()
     }
 
     def "Success calculating balance"() {
@@ -27,12 +26,13 @@ class BalanceTest extends Specification {
                 .toList()
 
         when: "calculating balance"
-        def results = subject.calculateBalance(input, "2021-05-25")
+        def results = subject.calculate(input, "2021-05-25")
 
         then: "the summary statistics are correct"
-        results.aggregateAdvanceBalance().round(2) == -99.12
+        results.aggregateAdvanceBalance().round(2) == 0.00
         results.interestPayableBalance().round(2) == 0.00
         results.totalInterestPaid().round(2) == 0.88
+        results.balanceApplicableToFutureAdvances().round(2) == 99.12
         and: "the advances reflect a valid balance"
         assertThat(results.advances())
                 .containsExactlyInAnyOrder(
