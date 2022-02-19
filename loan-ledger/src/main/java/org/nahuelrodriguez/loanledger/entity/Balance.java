@@ -1,10 +1,12 @@
 package org.nahuelrodriguez.loanledger.entity;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public record Balance(SummaryStatistics summaryStatistics, Set<Advance> advances) {
+public record Balance(SummaryStatistics summaryStatistics, Collection<Advance> advances) {
     public BigDecimal aggregateAdvanceBalance() {
         return getAbsoluteValueOrZero(e -> e.compareTo(BigDecimal.ZERO) >= 0);
     }

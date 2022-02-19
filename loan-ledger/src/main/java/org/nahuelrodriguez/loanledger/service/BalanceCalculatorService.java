@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
@@ -32,7 +31,7 @@ public class BalanceCalculatorService {
             processPayment(loanEvent.amount(), advances, summaryStatistics);
         }
         summaryStatistics.updateFees(LocalDate.parse(date).plusDays(1));
-        return new Balance(summaryStatistics, Set.copyOf(advances.values()));
+        return new Balance(summaryStatistics, advances.values());
     }
 
     private void processPayment(BigDecimal payAmount, final Map<Long, Advance> advances, final SummaryStatistics summaryStatistics) {
