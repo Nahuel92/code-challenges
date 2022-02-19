@@ -26,7 +26,6 @@ class BalanceCalculatorServiceTest extends Specification {
                 .lines()
                 .map(e -> e.split(","))
                 .map(e -> new SavedLoanEvent(1, e[0], LocalDate.parse(e[1]), new BigDecimal(e[2])))
-                .toList()
 
         when: "calculating balance"
         def results = subject.calculate(input, "2021-05-25")

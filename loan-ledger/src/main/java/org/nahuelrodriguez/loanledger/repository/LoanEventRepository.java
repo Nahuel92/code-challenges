@@ -14,8 +14,8 @@ import java.nio.file.Path;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Repository
 public class LoanEventRepository {
@@ -33,17 +33,7 @@ public class LoanEventRepository {
             System.out.println("Database already exists");
             return;
         }
-
-        final var sql = """
-                CREATE TABLE events (
-                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                    type VARCHAR(32) NOT NULL,
-                    amount DECIMAL NOT NULL,
-                    date_created DATE NOT NULL
-                    CHECK (type IN ('advance', 'payment'))
-                );
-                """;
-        jdbcTemplate.execute(sql);
+        jdbcTemplate.execute(Query.create());
         System.out.println("Initialized database at " + db.toAbsolutePath());
     }
 
@@ -58,42 +48,62 @@ public class LoanEventRepository {
     }
 
     @Transactional
-    public Long insert(final List<LoanEvent> events) {
-        return Arrays.stream(jdbcTemplate
-                        .batchUpdate("INSERT INTO events(type, amount, date_created) VALUES (?, ?, ?);",
-                                new BatchPreparedStatementSetter() {
-                                    @Override
-                                    public void setValues(final PreparedStatement ps, int i) throws SQLException {
-                                        ps.setString(1, events.get(i).type());
-                                        ps.setBigDecimal(2, events.get(i).amount());
-                                        ps.setString(3, events.get(i).date().toString());
-                                    }
+    public Integer insert(final List<LoanEvent> events) {
+        return jdbcTemplate
+                .batchUpdate(Query.insert(),
+                        new BatchPreparedStatementSetter() {
+                            @Override
+                            public void setValues(final PreparedStatement ps, int i) throws SQLException {
+                                ps.setString(1, events.get(i).type());
+                                ps.setBigDecimal(2, events.get(i).amount());
+                                ps.setString(3, events.get(i).date().toString());
+                            }
 
-                                    @Override
-                                    public int getBatchSize() {
-                                        return events.size();
-                                    }
-                                }
-                        ))
-                .count();
+                            @Override
+                            public int getBatchSize() {
+                                return events.size();
+                            }
+                        }
+                ).length;
     }
 
-    public List<SavedLoanEvent> fetch(final String date) {
-        final var sql = """
+    public Stream<SavedLoanEvent> fetch(final String date) {
+        return jdbcTemplate
+                .queryForStream(Query.fetch(),
+                (rs, rn) -> new SavedLoanEvent(
+                        rs.getLong(1),
+                        rs.getString(2),
+                        LocalDate.parse(rs.getString(3)),
+                        rs.getBigDecimal(4)
+                ),
+                date
+        );
+    }
+}
+
+class Query {
+    public static String create() {
+        return """
+                CREATE TABLE events (
+                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    type VARCHAR(32) NOT NULL,
+                    amount DECIMAL NOT NULL,
+                    date_created DATE NOT NULL
+                    CHECK (type IN ('advance', 'payment'))
+                );
+                """;
+    }
+
+    public static String insert() {
+        return "INSERT INTO events(type, amount, date_created) VALUES (?, ?, ?);";
+    }
+
+    public static String fetch() {
+        return """
                 SELECT id, type, date_created, amount
                 FROM events
                 WHERE date_created <= ?
                 ORDER BY date_created;
                 """;
-        return jdbcTemplate
-                .query(sql,
-                        (rs, rn) -> new SavedLoanEvent(
-                                rs.getLong(1),
-                                rs.getString(2),
-                                LocalDate.parse(rs.getString(3)),
-                                rs.getBigDecimal(4)
-                        ),
-                        date
-                );
     }
 }

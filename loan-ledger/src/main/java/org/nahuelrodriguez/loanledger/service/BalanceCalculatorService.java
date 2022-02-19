@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 @Service
 public class BalanceCalculatorService {
@@ -17,13 +18,13 @@ public class BalanceCalculatorService {
     private BigDecimal interestPayableBalance = BigDecimal.ZERO;
     private BigDecimal totalInterestPaid = BigDecimal.ZERO;
 
-    public Balance calculate(final List<SavedLoanEvent> savedLoanEvents, final String date) {
+    public Balance calculate(final Stream<SavedLoanEvent> savedLoanEvents, final String date) {
         aggregateAdvanceBalance = interestPayableBalance = totalInterestPaid = BigDecimal.ZERO;
         LocalDate lastEventDate = null;
         final var advances = new LinkedHashMap<Long, Advance>();
 
         final var id = new AtomicLong(1);
-        for (final var loanEvent : savedLoanEvents) {
+        for (final var loanEvent : savedLoanEvents.toList()) {
             updateFees(lastEventDate, loanEvent.date());
             lastEventDate = loanEvent.date();
 
@@ -36,7 +37,6 @@ public class BalanceCalculatorService {
             processPayment(loanEvent.amount(), advances);
         }
         updateFees(lastEventDate, LocalDate.parse(date).plusDays(1));
-
         return new Balance(aggregateAdvanceBalance, interestPayableBalance, totalInterestPaid, Set.copyOf(advances.values()));
     }
 
