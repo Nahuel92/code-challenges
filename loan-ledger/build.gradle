@@ -19,6 +19,7 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
+    testImplementation 'com.github.stefanbirkner:system-lambda:1.2.1'
 
 }
 
