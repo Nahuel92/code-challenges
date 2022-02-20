@@ -30,6 +30,24 @@
 
 ### Compiling and Running the Project
 
+#### Docker approach
+
+1. Run the following command from a terminal window (make sure the PWD is the project root directory):
+
+   ```bash
+   docker build -t org/nahuelrodriguez-loanledger .
+   ```
+
+2. Run the following command:
+
+```bash
+docker run --rm -it org/nahuelrodriguez-loanledger
+```
+
+> **Important:** If you want to add new test data files for later testing, put them under the `src/test/resources/tests` directory before building the Docker image.
+
+#### Manual approach #1
+
 1. Run the following command from a terminal window (make sure the PWD is the project root directory):
 
    ```bash
@@ -51,7 +69,7 @@
    Where `JAR_NAME` is the name of the Jar file (it should be `loan-ledger-0.0.1-SNAPSHOT.jar` but do check the Jar
    name because it may be different in your case).
 
-#### Alternative approach
+#### Manual approach #2
 
 1. Run the following command from a terminal window (make sure the PWD is the project root directory):
 
@@ -72,6 +90,16 @@ java -jar build/libs/*.jar
 ```
 
 ### Test data files
+
+#### Docker approach
+
+You will find the test files under the `test-files` directory inside the container (including the ones you may have added when building the Docker image). For example, to load the `test1.csv` file run:
+
+```bash
+load test-files/test1.csv
+```
+
+### Manual approach
 
 You can find the test data files under the `src/test/resources/tests` directory.
 

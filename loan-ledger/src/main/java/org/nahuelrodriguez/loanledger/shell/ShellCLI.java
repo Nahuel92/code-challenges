@@ -49,10 +49,16 @@ public class ShellCLI {
 
     @ShellMethod("Loads a CSV file that contains advance and payment events")
     void load(@ShellOption final String filePath) {
+        if (!Files.exists(Path.of(dbName))) {
+            System.out.println("Database does not exist at " + dbName + ", please create it using `create-db` command");
+            return;
+        }
+
         System.out.println("Load events with data from csv file.");
         final var path = Path.of(filePath);
+
         if (!Files.exists(path)) {
-            System.out.println("Database does not exist at " + dbName + ", please create it using `create-db` command");
+            System.out.println("Data file not found, please check the path entered!");
             return;
         }
 
