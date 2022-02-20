@@ -2,6 +2,11 @@
 
 > **Important:** this document assumes you use a Unix-like OS. If you are running Windows, then you have to replace the commands provided here for Windows-equivalent ones.
 
+#### Docker approach
+- Docker up and running.
+- Internet connection (to download dependencies).
+
+#### Manual approach
 - Java 17.
 - **(Optional)** Gradle. The project is bundled with a Gradle wrapper ready to use (the commands described by this guide
   use the bundled Gradle wrapper).
