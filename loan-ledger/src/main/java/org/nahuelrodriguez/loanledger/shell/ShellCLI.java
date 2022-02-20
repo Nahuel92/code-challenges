@@ -37,17 +37,32 @@ public class ShellCLI {
         this.dbName = dbName;
     }
 
-    @ShellMethod("Initializes the SQLite database")
+    @ShellMethod("Initialize the SQLite database")
     void createDb() {
         loanEventRepository.createDB();
     }
 
-    @ShellMethod("Deletes the SQLite database")
+    @ShellMethod("Delete the SQLite database")
     public void dropDb() throws IOException {
         loanEventRepository.dropDB();
     }
 
-    @ShellMethod("Loads a CSV file that contains advance and payment events")
+    @ShellMethod("Get loan balances")
+    void balances(@ShellOption(defaultValue = "") String endDate) {
+        if (endDate.isBlank()) {
+            endDate = LocalDate.now().toString();
+        }
+
+        if (!LocalDateUtils.isValidDate(endDate)) {
+            System.out.println("Invalid date. Enter balance valid date in balance valid format(yyyy-MM-dd) ");
+            return;
+        }
+        final var savedLoanEvents = loanEventRepository.fetch(endDate);
+        final var balance = balanceCalculatorService.calculate(savedLoanEvents, endDate);
+        balancePrinterService.print(balance);
+    }
+
+    @ShellMethod("Load a CSV file that contains advance and payment events")
     void load(@ShellOption final String filePath) {
         if (!Files.exists(Path.of(dbName))) {
             System.out.println("Database does not exist at " + dbName + ", please create it using `create-db` command");
@@ -70,20 +85,5 @@ public class ShellCLI {
         }
         final var count = loanEventRepository.insert(set);
         System.out.println("Loaded " + count + " events from " + path.toAbsolutePath());
-    }
-
-    @ShellMethod("Gets loan balances")
-    void balances(@ShellOption(defaultValue = "") String endDate) {
-        if (endDate.isBlank()) {
-            endDate = LocalDate.now().toString();
-        }
-
-        if (!LocalDateUtils.isValidDate(endDate)) {
-            System.out.println("Invalid date. Enter balance valid date in balance valid format(yyyy-MM-dd) ");
-            return;
-        }
-        final var savedLoanEvents = loanEventRepository.fetch(endDate);
-        final var balance = balanceCalculatorService.calculate(savedLoanEvents, endDate);
-        balancePrinterService.print(balance);
     }
 }

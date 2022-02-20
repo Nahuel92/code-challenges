@@ -5,7 +5,7 @@
 - Java 17.
 - **(Optional)** Gradle. The project is bundled with a Gradle wrapper ready to use (the commands described by this guide
   use the bundled Gradle wrapper).
-- Internet connection (to dowload dependencies).
+- Internet connection (to download dependencies).
 
 ### Available CLI Commands
 
@@ -21,12 +21,12 @@
 
 **Shell CLI**
 
-| Command       | Description                                               |
-| ------------- | --------------------------------------------------------- |
-| **balances**  | Gets loan balances                                        |
-| **create-db** | Initializes the SQLite database                           |
-| **drop-db**   | Deletes the SQLite database                               |
-| **load**      | Loads a CSV file that contains advance and payment events |
+| Command       | Description                                            |
+| ------------- | ------------------------------------------------------ |
+| **balances**  | Get loan balances                                      |
+| **create-db** | Initialize the SQLite database                         |
+| **drop-db**   | Delete the SQLite database                             |
+| **load**      | Load a CSV file that contains advance and payment events |
 
 ### Compiling and Running the Project
 

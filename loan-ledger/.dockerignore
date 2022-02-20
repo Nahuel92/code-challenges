@@ -1,0 +1,8 @@
+.idea
+original-python-code
+.dockerignore
+.gitignore
+Dockerfile
+HELP.md
+README.md
+*.iml
