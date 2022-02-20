@@ -45,9 +45,9 @@
 
 2. Run the following command:
 
-```bash
-docker run --rm -it org/nahuelrodriguez-loanledger
-```
+   ```bash
+   docker run --rm -it org/nahuelrodriguez-loanledger
+   ```
 
 > **Important:** If you want to add new test data files for later testing, put them under the `src/test/resources/tests` directory before building the Docker image.
 
