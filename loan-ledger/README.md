@@ -90,9 +90,9 @@
 
 3. Run the following command:
 
-```bash
-java -jar build/libs/*.jar
-```
+   ```bash
+   java -jar build/libs/*.jar
+   ```
 
 ### Test data files
 
