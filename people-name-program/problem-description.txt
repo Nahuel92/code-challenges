@@ -1,9 +1,3 @@
-People Name Program 1.0
-=======================
-
-Description
------------
-
 Write a program that processes the included example file that contains
 people's names, outputs some statistics and generates updated output.
 
@@ -150,59 +144,3 @@ Note: Each first name and last name should be used exactly once (see example of 
     Crews, Carl
     Cartman, Carl
     ... 22 more names if N=25 ...
-
-Important Notes
----------------
-
-. While our backend is primarily written in Java and Kotlin, we use
-  Python and Scala as well. You can choose any of these languages for
-  your solution. We recommend you choose the language you are the most
-  comfortable with.
-. This exercise tests your knowledge of data structures and sorting. It
-  is simple enough to be completed using just the standard library of
-  your language of choice. Please, do not use any frameworks, databases
-  or non-standard libraries (except for unit testing).
-. The program should be as time and memory efficient as you can
-  make it. Keep in mind that your code will be executed against much
-  larger data sets! How does that affect your approach? Can you point
-  out what you specifically did in your design to address this?
-. The program should provide the correct answers. How did you test for
-  correctness?
-. You should provide the output of your program with your submission.
-. It should be easy for others compile and execute your submission. Build
-  tools (maven, gradle, sbt, ant, etc) can come in very handy for this.
-  Please, avoid submitting binaries and instead give instructions on
-  how to build and run your code. And above all, your code should
-  compile!
-. The program should be as concise and readable as possible.
-. Brief comments explaining implementation choices are welcome, but
-  not required.
-. You can hard code the name of the input file and the modified name
-  count into your program (to make it easier to write) but it should
-  otherwise be built to handle an arbitrary file with the same format
-  as the example file.
-. Last but not least, you should be prepared to discuss the solution
-  you came up with for the exercise. We value highly not just your ability
-  to complete the work, but also your ability to explain why you took the
-  approach you did and what factors you considered while doing it.
-
-
-Finishing Up
-------------
-
-Please, archive the following into a compressed file:
-* Your source code (no binaries or IDE specific files please).
-* Your build file (e.g., pom.xml, build.xml etc) and/or instructions on how to
-  compile your program.
-* A txt file with the output of your program.
-
-Upload your archive to G-Drive or Dropbox and forward the link to
-coding-challenges@traackr.com. We are avoiding email for these submissions
-because attachments may get rejected.
-
-Thanks for investing the time to do this!  We believe this should
-take you about two to three hours to write assuming you have proficiency with
-your chosen programming language.
-
-If anything is unclear, shoot us an email at coding-challenges@traackr.com and
-we'll get it cleared up.

@@ -77,13 +77,13 @@ public class ShellCLI {
             return;
         }
 
-        final List<LoanEvent> set;
+        final List<LoanEvent> loanEvents;
         try (final var content = Files.lines(path)) {
-            set = content.map(loanEventParser::parse).collect(Collectors.toList());
+            loanEvents = content.map(loanEventParser::parse).toList();
         } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }
-        final var count = loanEventRepository.insert(set);
+        final var count = loanEventRepository.insert(loanEvents);
         System.out.println("Loaded " + count + " events from " + path.toAbsolutePath());
     }
 }
